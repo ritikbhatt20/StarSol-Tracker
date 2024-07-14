@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  margin: 0%;
+  padding: 0%;
+  background: #040112;
+  color: white;
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: #040112;
+}
+
+::-webkit-scrollbar-thumb {
+  background: red;
+}
+
+@font-face {
+  font-family: "Starwars";
+
+  src: url("../../public/fonts/Starjedi.ttf");
+}
