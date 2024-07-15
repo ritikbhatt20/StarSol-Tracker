@@ -343,7 +343,7 @@ const Transaction = () => {
         } min-h-[60vh] justify-center items-center`}
       >
         <span className="text-blue-500">
-          No transactions to show connect to wallet
+          No transactions to show. Please connect to wallet
         </span>
       </div>
     </>

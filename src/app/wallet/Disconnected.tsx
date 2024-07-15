@@ -19,8 +19,7 @@ const Disconnected = () => {
           <div className="flex flex-col gap-5 justify-center items-center ">
             <p className="text-lg md:text-4xl">track solana wallets</p>
             <p className="text-center text-base">
-              Connect your Wallet and track all Solana coins, check your Daily
-              PNL and more
+              Enter Address of any Wallet and track all transactions processed and token holdings
             </p>
           </div>
 
