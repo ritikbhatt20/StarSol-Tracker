@@ -11,6 +11,7 @@ import {
   truncatedPublicKeyForTransaction,
   truncatedPublicKey,
 } from "@/utils/helper";
+import { useWalletStore } from "@/utils/zustand";
 
 interface TokenBalance {
   mintAddress: string;
@@ -18,15 +19,25 @@ interface TokenBalance {
 }
 
 const Transaction = () => {
+  const publicKey = useWalletStore((state) => state.publicKey);
+  const setShow = useWalletStore((state)=>state.setShow)  
+  const show = useWalletStore((state)=>state.show)
   const [activeTab, setActiveTab] = useState("tokens");
   const [showTabs, setShowTabs] = useState(true);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [tokenBalances, setTokenBalances] = useState<TokenBalance[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loadingTransactions, setLoadingTransactions] = useState(false);
+  const [loadingTokenBalances, setLoadingTokenBalances] = useState(false);
   const [transactionsFetched, setTransactionsFetched] = useState(false);
-  const [walletAddress, setWalletAddress] = useState(
-    "G2k6ShTNEyJo84Gu6Dey6ubKagaFQzjBxffncNtPJuqR"
-  );
+
+  useEffect(() => {
+    console.log("Public key:", publicKey);
+
+    if (publicKey) {
+      fetchTransactions();
+      fetchTokenBalances();
+    }
+  }, [publicKey]);
 
   useEffect(() => {
     if (!showTabs) {
@@ -54,7 +65,7 @@ const Transaction = () => {
         console.warn("Rate limit exceeded. Retrying after delay...");
         const retryAfter = error.headers.get("Retry-After") || delay;
         await new Promise((resolve) => setTimeout(resolve, retryAfter));
-        return fetchWithRetry(fn, retries - 1, Math.min(delay * 2, 30000)); // cap max delay to 30 seconds
+        return fetchWithRetry(fn, retries - 1, Math.min(delay * 2, 30000));
       }
 
       throw error;
@@ -63,17 +74,24 @@ const Transaction = () => {
 
   const fetchTransactions = async () => {
     try {
-      setLoading(true);
+      console.log("Fetching transactions...");
+
+      setLoadingTransactions(true);
       const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
 
       const signatures = await fetchWithRetry(
         () =>
           connection.getConfirmedSignaturesForAddress2(
-            new PublicKey(walletAddress)
+            new PublicKey(publicKey!)
           ),
         5,
         3000
       );
+      if(signatures){
+        setShow(true)
+      }
+
+      console.log(signatures);
 
       const transactions = await Promise.all(
         signatures.map(async (signatureInfo: ConfirmedSignatureInfo) => {
@@ -95,28 +113,30 @@ const Transaction = () => {
       );
       setTransactions(filteredTransactions);
       localStorage.setItem(
-        `transactions-${walletAddress}`,
+        `transactions-${publicKey}`,
         JSON.stringify(filteredTransactions)
-      ); // Save transactions to local storage with wallet-specific key
+      );
       setTransactionsFetched(true);
     } catch (error) {
       console.error("Error fetching transactions:", error);
     } finally {
-      setLoading(false);
+      setLoadingTransactions(false);
     }
   };
 
   const fetchTokenBalances = async () => {
     try {
+      setLoadingTokenBalances(true);
       const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-      const parsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(
-        new PublicKey(walletAddress),
-        {
-          programId: new PublicKey(
-            "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-          ), // SPL Token program id
-        }
-      );
+      const parsedTokenAccounts =
+        await connection.getParsedTokenAccountsByOwner(
+          new PublicKey(publicKey!),
+          {
+            programId: new PublicKey(
+              "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+            ),
+          }
+        );
 
       const tokenBalances = parsedTokenAccounts.value.map((accountInfo) => {
         const accountData = accountInfo.account.data.parsed.info;
@@ -129,21 +149,10 @@ const Transaction = () => {
       setTokenBalances(tokenBalances);
     } catch (error) {
       console.error("Error fetching token balances:", error);
+    } finally {
+      setLoadingTokenBalances(false);
     }
   };
-
-  useEffect(() => {
-    const savedTransactions = localStorage.getItem(
-      `transactions-${walletAddress}`
-    );
-    if (savedTransactions) {
-      setTransactions(JSON.parse(savedTransactions));
-      setTransactionsFetched(true);
-    } else {
-      fetchTransactions();
-    }
-    fetchTokenBalances(); // Fetch token balances when the component mounts or walletAddress changes
-  }, [walletAddress]);
 
   function formatTransaction(transaction: any) {
     const signature = truncatedPublicKeyForTransaction(
@@ -165,17 +174,8 @@ const Transaction = () => {
     };
   }
 
-  const handleWalletChange = (newWalletAddress: string) => {
-    if (newWalletAddress !== walletAddress) {
-      setWalletAddress(newWalletAddress);
-      setTransactions([]); // Clear current transactions
-      setTokenBalances([]); // Clear current token balances
-      setTransactionsFetched(false); // Reset fetched state
-    }
-  };
-
   return (
-    <div className="min-h-screen flex flex-col py-24 container">
+    <div className={`min-h-screen flex-col py-24 container ${show? "flex":"hidden"}`}>
       <div className="mb-4">
         <ul
           className="flex flex-wrap -mb-px text-sm font-medium text-center"
@@ -195,7 +195,7 @@ const Transaction = () => {
               aria-controls="tokens"
               aria-selected={activeTab === "tokens"}
             >
-              tokens
+              Tokens
             </button>
           </li>
           <li className="me-2" role="presentation">
@@ -211,7 +211,7 @@ const Transaction = () => {
               aria-controls="transactions"
               aria-selected={activeTab === "transactions"}
             >
-              transactions
+              Transactions
             </button>
           </li>
         </ul>
@@ -221,40 +221,49 @@ const Transaction = () => {
         <div id="default-styled-tab-content" className="w-full mt-6">
           {activeTab === "tokens" && (
             <div className="" id="styled-tokens" role="tabpanel">
-              <table className="w-full text-sm text-left rtl:text-righttext-gray-400">
-                <thead className="text-xs text-gray-700  bg-slate-950 dark:text-gray-400">
-                  <tr>
-                    <th scope="col" className="px-6 py-3">
-                      Mint Address
-                    </th>
-                    <th scope="col" className="px-6 py-3">
-                      Total Balance
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tokenBalances.map((token, index) => (
-                    <tr key={index} className="bg-slate-900 dark:border-gray-700">
-                      <td className="px-6 py-4 font-medium text-green-600 whitespace-nowrap">
-                        {token.mintAddress}
-                      </td>
-                      <td className="px-6 py-4">{token.balance}</td>
+              {loadingTokenBalances ? (
+                <div className="text-center p-4">
+                  <span className="text-blue-500">
+                    Loading token balances...
+                  </span>
+                </div>
+              ) : (
+                <table className="w-full text-sm text-left rtl:text-righttext-gray-400">
+                  <thead className="text-xs text-gray-700  bg-slate-950 dark:text-gray-400">
+                    <tr>
+                      <th scope="col" className="px-6 py-3">
+                        Mint Address
+                      </th>
+                      <th scope="col" className="px-6 py-3">
+                        Total Balance
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {tokenBalances.map((token, index) => (
+                      <tr
+                        key={index}
+                        className="bg-slate-900 dark:border-gray-700"
+                      >
+                        <td className="px-6 py-4 font-medium text-green-600 whitespace-nowrap">
+                          {token.mintAddress}
+                        </td>
+                        <td className="px-6 py-4">{token.balance}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           )}
           {activeTab === "transactions" && (
             <div className=" " id="styled-transactions" role="tabpanel">
-              <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                {loading ? (
-                  <div className="text-center p-4">
-                    <span className="text-blue-500">
-                      Loading transactions...
-                    </span>
-                  </div>
-                ) : (
+              {loadingTransactions ? (
+                <div className="text-center p-4">
+                  <span className="text-blue-500">Loading transactions...</span>
+                </div>
+              ) : (
+                <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
                   <table className="w-full text-sm text-left rtl:text-righttext-gray-400">
                     <thead className="text-xs text-gray-700  bg-slate-950 dark:text-gray-400">
                       <tr>
@@ -292,8 +301,8 @@ const Transaction = () => {
                       ))}
                     </tbody>
                   </table>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           )}
         </div>

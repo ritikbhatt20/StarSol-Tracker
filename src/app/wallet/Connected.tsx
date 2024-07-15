@@ -18,7 +18,7 @@ interface TokenBalance {
   balance: number;
 }
 
-const Transaction = () => {
+const Connected = () => {
   const publicKey = useWalletStore((state) => state.walletAddress);
   const setShow = useWalletStore((state)=>state.setShow)  
   const show = useWalletStore((state)=>state.show)
@@ -315,4 +315,4 @@ const Transaction = () => {
   );
 };
 
-export default Transaction;
+export default Connected;

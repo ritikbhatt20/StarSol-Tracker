@@ -1,5 +1,5 @@
 // components/WalletButton.tsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   useWallet,
   Wallet as SolanaWallet,
@@ -18,32 +18,41 @@ import {
 } from "@chakra-ui/react";
 import { useWalletStore } from "@/utils/zustand";
 import { truncatedPublicKey } from "@/utils/helper";
+import { WalletName } from "@solana/wallet-adapter-base";
 
 const WalletButton = () => {
   const { wallets, select, connect, disconnect, connected, publicKey, wallet } =
     useWallet();
   const setPublicKey = useWalletStore((state) => state.setPublicKey);
+  const [isConnecting, setIsConnecting] = useState(false);
 
-  const onSelectWallet = async (wallet: SolanaWallet) => {
+  useEffect(() => {
+    if (connected && publicKey) {
+      setPublicKey(publicKey.toBase58());
+      console.log("Wallet connected:", publicKey.toBase58());
+    }
+  }, [connected, publicKey, setPublicKey]);
+
+  const connectWallet = async (walletName: WalletName) => {
+    setIsConnecting(true);
     try {
-      console.log("Selecting wallet:", wallet.adapter.name);
-      await select(wallet.adapter.name);
-      console.log("Connecting wallet...");
+      await select(walletName);
       await connect();
-      console.log(
-        "Wallet connected:",
-        publicKey ? publicKey.toBase58() : "undefined"
-      );
-      if (publicKey) {
-        setPublicKey(publicKey.toBase58());
-      }
+      console.log("Hi");
     } catch (error) {
       if (error instanceof WalletNotSelectedError) {
         console.warn("Wallet is not selected.");
       } else {
         console.error("Wallet Error:", error);
       }
+    } finally {
+      setIsConnecting(false);
     }
+  };
+
+  const onSelectWallet = async (wallet: SolanaWallet) => {
+    console.log("Selecting wallet:", wallet.adapter.name);
+    await connectWallet(wallet.adapter.name);
   };
 
   const onDisconnectWallet = async () => {
@@ -53,7 +62,7 @@ const WalletButton = () => {
       setPublicKey(null); // Clear the public key in Zustand store
       console.log("Wallet disconnected");
     } catch (e) {
-      console.error("Wallet Error: ", e);
+      console.error("Wallet Error:", e);
     }
   };
 
@@ -92,6 +101,7 @@ const WalletButton = () => {
             key={wallet.adapter.name}
             onClick={() => onSelectWallet(wallet)}
             border={4}
+            isDisabled={isConnecting} // Disable button while connecting
           >
             <Flex py={10} px={4}>
               <Box w="2rem" h="2rem" mr="1rem">
