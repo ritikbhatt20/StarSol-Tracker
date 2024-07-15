@@ -41,13 +41,13 @@ StarSol Tracker is a web application designed to help users easily track and man
 To get started with StarSol Tracker, follow these steps:
 
 
-1. Clone the repository:
+1. **Clone the repository**:
    ```sh
    git clone https://github.com/your-username/starsol-tracker.git
    cd starsol-tracker
 
 
-2. Install the dependencies:
+2. **Install the dependencies**:
    ```sh
    npm install
 
@@ -96,16 +96,16 @@ StarSol Tracker can be deployed on Cloudflare or Vercel for easy access.
 
 # Deploy on Vercel
 
-1. Push your project to a GitHub repository.
-2. Go to Vercel and create a new project.
-3. Select your GitHub repository and follow the prompts to deploy.
+1. **Push your project to a GitHub repository.**
+2. **Go to Vercel and create a new project.**
+3. **Select your GitHub repository and follow the prompts to deploy.**
 
 
 # Deploy on Cloudflare
 
-1. Push your project to a GitHub repository.
-2. Go to Cloudflare Pages and create a new project.
-3. Select your GitHub repository and follow the prompts to deploy.
+1. **Push your project to a GitHub repository.**
+2. **Go to Cloudflare Pages and create a new project.**
+3. **Select your GitHub repository and follow the prompts to deploy.**
 
 
 ## Contributing
