@@ -2,6 +2,7 @@
 
 **Easily Track and Manage Your Assets with StarSol, the Web3 Dashboard**
 
+
 ## Table of Contents
 
 - [Introduction](#introduction)
@@ -13,9 +14,11 @@
 - [Contributing](#contributing)
 - [License](#license)
 
+
 ## Introduction
 
 StarSol Tracker is a web application designed to help users easily track and manage their assets on the Solana blockchain. The application provides a user-friendly interface for viewing wallet balances and transaction histories, making it accessible to a broad range of users.
+
 
 ## Features
 
@@ -25,26 +28,32 @@ StarSol Tracker is a web application designed to help users easily track and man
 - **Transaction History**: View recent transactions for any wallet address.
 - **Deployment**: Easily deployable on Cloudflare or Vercel.
 
+
 ## Technologies Used
 
 - **Next.js**: React framework for server-side rendering and static site generation.
 - **Solana Web3.js**: JavaScript API for interacting with the Solana blockchain.
 - **Tailwind CSS**: Utility-first CSS framework for styling.
 
+
 ## Installation
 
 To get started with StarSol Tracker, follow these steps:
+
 
 1. Clone the repository:
    ```sh
    git clone https://github.com/your-username/starsol-tracker.git
    cd starsol-tracker
 
+
 2. Install the dependencies:
    ```sh
    npm install
 
+
 ## Usage
+
 To run the development server, use the following command:
    ```sh
    npm run dev
@@ -52,9 +61,11 @@ To run the development server, use the following command:
 
 Open http://localhost:3000 with your browser to see the result.
 
+
 ## Wallet Tracker
 
 On the Wallet Tracker page, you can enter any wallet address to view its token holdings and recent transactions.
+
 
 # Token Holdings:
 
@@ -66,6 +77,7 @@ On the Wallet Tracker page, you can enter any wallet address to view its token h
 | DowwnMPZ7dj7MzUxxrMPxpLWNhBMvJwbvBk3L5byWFf   | 12710         |
 | 4gE6ex9oYxrn6BTcT6MkHcgjw3uMMj64Uhz3gFcQUgTn  | 0             |
 
+
 # Transactions:
 
 | Transaction Signature | Block      | Age           | Timestamp                        | Result  |
@@ -76,9 +88,11 @@ On the Wallet Tracker page, you can enter any wallet address to view its token h
 | 5wR7...VR3utzZRKPVfF1RRS2 | 310941796 | 4 days ago    | Jul 11, 2024 at 20:26:31 UTC     | Success |
 | 2LSW...CWi3GTMigwgtgmiCfR | 310940307 | 4 days ago    | Jul 11, 2024 at 20:17:09 UTC     | Success |
 
+
 ## Deployment
 
 StarSol Tracker can be deployed on Cloudflare or Vercel for easy access.
+
 
 # Deploy on Vercel
 
@@ -86,11 +100,13 @@ StarSol Tracker can be deployed on Cloudflare or Vercel for easy access.
 2. Go to Vercel and create a new project.
 3. Select your GitHub repository and follow the prompts to deploy.
 
+
 # Deploy on Cloudflare
 
 1. Push your project to a GitHub repository.
 2. Go to Cloudflare Pages and create a new project.
 3. Select your GitHub repository and follow the prompts to deploy.
+
 
 ## Contributing
 
