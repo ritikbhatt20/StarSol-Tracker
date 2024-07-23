@@ -35,6 +35,7 @@ const Footer = (props: Props) => {
           </ul>
         </div>
         <hr className="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
+     <p className="w-full text-center text-sm">Made with ❤️ by Mayank Dev and Ritik Bhatt </p>
       </div>
     </div>
   );
